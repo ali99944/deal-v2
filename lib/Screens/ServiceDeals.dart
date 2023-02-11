@@ -1,6 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:deal/Screens/DealDetails.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'dart:convert';
+
+import '../Provider/UserProvider.dart';
+import '../Services/UserServices.dart';
 
 class ServiceDeals extends StatefulWidget {
   final String category;
@@ -11,6 +17,7 @@ class ServiceDeals extends StatefulWidget {
 }
 
 class _ServiceDealsState extends State<ServiceDeals> {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,8 +27,27 @@ class _ServiceDealsState extends State<ServiceDeals> {
           builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if(snapshot.hasData && !snapshot.hasError){
               List serviceDeals = snapshot.data!.docs.where((field) => field['serviceName'] == widget.category).toList();
-              return serviceDeals.isEmpty ? const Center(
-                child:Text('no deals yet',style: TextStyle(fontSize: 30,color: Colors.amber,fontFamily: 'serif'),)
+              return serviceDeals.isEmpty ? Container(
+                child: Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.center,
+                        child:Text('emptyDeals',style: TextStyle(fontSize: 30,color: Colors.amber,fontFamily: 'serif'),).tr()
+                    ),
+                    
+                    Positioned(
+                      child: IconButton(
+                        icon: Icon(Icons.arrow_back_ios,size: 40,color: Colors.amber,),
+                        onPressed: (){
+                          Navigator.pop(context);
+                        },
+                      ),
+                      top: 10,
+                      left: 10,
+                    )
+                  ],
+                ),
+                color: Colors.black,
               ) : ListView.builder(
                 itemCount: serviceDeals.length,
                 itemBuilder: (context,i){
@@ -38,14 +64,40 @@ class _ServiceDealsState extends State<ServiceDeals> {
                       height: 200,
                       decoration: BoxDecoration(
                           color: Colors.black.withOpacity(0.9),
-                          borderRadius: BorderRadius.circular(12.0)
+                          borderRadius: BorderRadius.circular(12.0),
+                        image: DecorationImage(
+                          image: Image.memory(base64Decode(deal['shopImage'])).image,
+                          fit:BoxFit.cover
+                        )
                       ),
                       child: Stack(
                         children: [
                           Positioned(
-                            child: IconButton(
-                              icon: Icon(Icons.star,size: 30,color: Colors.white,),
-                              onPressed: (){},
+                            child: StreamBuilder(
+                              stream: FirebaseFirestore.instance.collection("favorites").snapshots(),
+                              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+                                if(snapshot.hasData && !snapshot.hasError){
+                                  List data = snapshot.data!.docs;
+                                  bool isFavorite = data.any((element) => element.data()['favorites'].contains(serviceDeals[i].id));
+
+                                  return IconButton(
+                                    icon: Icon(Icons.star,size: 30,color: !isFavorite ? Colors.white : Colors.amber,),
+                                    onPressed: () async {
+                                      String uid = Provider.of<UserProvider>(context,listen:false).uid;
+                                      if(!isFavorite){
+                                        await UserServices.addToFavorites(uid,serviceDeals[i].id);
+                                      }else{
+                                        await UserServices.removeFromFavorites(uid,serviceDeals[i].id);
+                                      };
+                                    },
+                                  );
+                                }else{
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
+                              },
+
                             ),
                             top: 8,
                             right: 8,
@@ -53,21 +105,24 @@ class _ServiceDealsState extends State<ServiceDeals> {
                           Positioned(
                               child: Container(
                                 padding: EdgeInsets.all(8.0),
-                                color: Colors.amber,
-                                child: Text('Discount ${deal['discount']}%'),
+                                decoration: BoxDecoration(
+                                  gradient: new RadialGradient(
+                                    radius: 2,
+                                    focalRadius: 3,
+                                    colors:[Colors.yellowAccent, Colors.orange]
+                                  ),
+                                  color: Colors.amber,
+                                ),
+                                child: Text('${"discount_message".tr()} ${deal['discount']}%'),
                               ),
                               bottom: 7,
                               left:7
                           ),
                           Positioned(
-                              child: Text('${deal['shopName']}',style: TextStyle(color: Colors.white),),
+                              child: Text('${context.locale.languageCode == 'en' ? deal['shopName'] : deal['arShopName']}',style: TextStyle(color: Colors.white),),
                               bottom: 7,
                               right:7
                           ),
-                          Align(
-                            child: Text('Deal Card',style: TextStyle(fontSize: 25,color: Colors.amber,fontFamily: 'serif'),),
-                            alignment: Alignment.center,
-                          )
                         ],
                       ),
                     ),

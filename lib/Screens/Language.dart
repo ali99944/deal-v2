@@ -1,5 +1,6 @@
 
 import 'package:deal/Screens/DrawerScreen.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class Language extends StatelessWidget {
@@ -9,7 +10,7 @@ class Language extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: Text("Change Language")),
+        title: Center(child: Text("change_language").tr()),
         backgroundColor: Colors.black,
 
       ),
@@ -25,7 +26,9 @@ class Language extends StatelessWidget {
                 child: Container(
                   width: 120,
                   child: MaterialButton(
-                      onPressed: (){},
+                      onPressed: ()async{
+                        await context.setLocale(Locale('en',''));
+                      },
                     color: Colors.amber,
                     child: Text('English'),
                   ),
@@ -38,7 +41,9 @@ class Language extends StatelessWidget {
                 child: Container(
                   width: 120,
                   child: MaterialButton(
-                    onPressed: (){},
+                    onPressed: ()async{
+                      await context.setLocale(Locale('ar',''));
+                    },
                     color: Colors.amber,
                     child: Text('اللفه العربيه '),
                   ),

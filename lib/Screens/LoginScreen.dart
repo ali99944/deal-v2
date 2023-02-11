@@ -1,22 +1,20 @@
-
-import 'package:deal/Provider/AdminMode.dart';
+import 'package:deal/Provider/UserProvider.dart';
 import 'package:deal/Screens/HomeScreen.dart';
 import 'package:deal/Screens/RegisterScreen.dart';
+import 'package:deal/Services/UserServices.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import 'AdminHome.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatelessWidget {
    LoginScreen({Key? key}) : super(key: key);
 
   var FormKey = GlobalKey<FormState>();
-  bool isAdmin = false;
-  String ?email;
-  String? Password;
-  final adminPassword = '123456';
+
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,14 +32,14 @@ class LoginScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Text('welcome in deal',
+                        Text('welcome_message',
 
                           style: TextStyle(
                             fontSize: 25,
-                            fontStyle: FontStyle.italic,
-                            color: Colors.amber
+                            color: Colors.amber,
+                            fontWeight: FontWeight.bold
                           ),
-                        ),
+                        ).tr(),
                       ],
                     ),
                     SizedBox(height: 25,),
@@ -55,17 +53,16 @@ class LoginScreen extends StatelessWidget {
                         border: OutlineInputBorder(
 
                         ),
-                        hintText: 'Email',
+                        hintText: 'email_message'.tr(),
 
 
                       ) ,
-                      onChanged: (data){
-                        email = data;
-                      },
+                      controller: emailController,
                       validator: (value){
                         if(value!.isEmpty){
-                          return 'Enter your Email';
+                          return 'email_input_error'.tr();
                         }
+                        return null;
                       },
 
                     ),
@@ -80,17 +77,17 @@ class LoginScreen extends StatelessWidget {
                           border: OutlineInputBorder(
 
                           ),
-                          hintText: 'password',
+                          hintText: 'password_message'.tr(),
 
 
                       ) ,
-                      onChanged: (data){
-                        Password = data;
-                      },
+                      obscureText: true,
+                      controller: passwordController,
                       validator: (value){
                         if(value!.isEmpty){
-                          return 'Enter Password';
+                          return 'password_input_error'.tr();
                         }
+                        return null;
                       },
                     ),
                     SizedBox(height: 30,),
@@ -102,10 +99,29 @@ class LoginScreen extends StatelessWidget {
 
                           try{
                             var auth = FirebaseAuth.instance;
-                            UserCredential user =  await auth.signInWithEmailAndPassword(email: email!, password: Password!);
-                            Navigator.push(context, MaterialPageRoute(builder: (context){
-                              return HomeScreen();
-                            } ), );
+                            UserCredential creds = await auth.signInWithEmailAndPassword(email: emailController.text, password: passwordController.text);
+                            String uid = creds.user!.uid;
+
+                            bool status = await UserServices.changeUserStatus(uid: uid, status: 'online');
+                            print(status);
+                            if(status){
+                              Provider.of<UserProvider>(context,listen: false).changeUserId(uid);
+                              SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+                              await sharedPreferences.setBool('isLogged', true);
+                              await sharedPreferences.setString('email', emailController.text);
+                              await sharedPreferences.setString('password', passwordController.text);
+
+                              Navigator.push(context, MaterialPageRoute(builder: (context){
+                                return HomeScreen();
+                              } ), );
+                            }else{
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar
+                                (content: Text("couldn't update state"),
+                                backgroundColor: Colors.red
+                                ,),);
+                            }
+
                           } on FirebaseAuthException catch (ex){
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar
                               (content: Text('${ex.message.toString()}'),
@@ -117,7 +133,7 @@ class LoginScreen extends StatelessWidget {
                       },
                         color: Colors.amber,
 
-                        child: Text("Login",
+                        child: Text("login_message".tr(),
                           style: TextStyle(fontSize: 20.0,fontStyle: FontStyle.italic),
 
                         )
@@ -128,15 +144,15 @@ class LoginScreen extends StatelessWidget {
 
                     Padding(
                       padding: const EdgeInsets.all(20.0),
-                      child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Text('IF you don`t have account '),
+                          Text('no_account_yet').tr(),
                           TextButton(onPressed: (){
                             Navigator.push(context, MaterialPageRoute(builder: (context){
                               return RegisterScreen();
                             } ),);
-                          }, child: Text('Sign Up') )
+                          }, child: Text('sign_up_message').tr() )
                         ],
                       ),
                     ),
@@ -147,7 +163,7 @@ class LoginScreen extends StatelessWidget {
                       Navigator.push(context, MaterialPageRoute(builder: (context){
                         return HomeScreen();
                       }),);
-                    }, child: Text('Skip',style: TextStyle(color: Colors.black,fontSize: 22),))
+                    }, child: Text('skip_message',style: TextStyle(color: Colors.black,fontSize: 22),).tr())
                   ],
                 ),
               ),

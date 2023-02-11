@@ -1,5 +1,6 @@
 
 import 'package:deal/Screens/DrawerScreen.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class Terms extends StatelessWidget {
@@ -9,7 +10,7 @@ class Terms extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: Text('Terms And Conditions')),
+        title: Center(child: Text('terms_message').tr()),
         backgroundColor: Colors.black,
       ),
       drawer: Drawer(
@@ -19,13 +20,13 @@ class Terms extends StatelessWidget {
         padding: const EdgeInsets.all(15.0),
         child: Column(
           children: [
-            Text("Terms And Conditions",
+            Text("terms_message",
               style: TextStyle(
                 color: Colors.grey,
                 decoration: TextDecoration.underline
 
               ),
-            ),
+            ).tr(),
             Text("Welcome to the Deal Card Application"
                 " Welcome to the Deal Card Application "
                 "Welcome to the Deal Card Application"
