@@ -81,13 +81,11 @@ Future<void> showFlutterNotification(RemoteMessage message) async {
       ),
     );
 
-    bool didAdd = await UserServices.addUserNotifications(
+    await UserServices.addUserNotifications(
         uid: message.data['uid'],
         title: notification.title!,
         body: notification.body!
     );
-
-    print(didAdd);
   }
 }
 

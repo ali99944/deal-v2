@@ -130,11 +130,11 @@ class HomeScreen extends StatelessWidget {
                                 child: Stack(
                                   children: [
                                     Align(
-                                      child: Text(service['serviceName'] ?? '',style:TextStyle(color:Colors.white,fontSize:15,fontWeight: FontWeight.bold)),
+                                      child: Text(service['serviceName'] ?? '',style:TextStyle(color:Colors.white,fontSize:14,fontWeight: FontWeight.bold)),
                                       alignment: Alignment.topCenter,
                                     ),
                                     Align(
-                                      child: Text('${service['arServiceName'] ?? ''}',style:TextStyle(color:Colors.white,fontSize:15,fontWeight: FontWeight.bold)),
+                                      child: Text('${service['arServiceName'] ?? ''}',style:TextStyle(color:Colors.white,fontSize:14,fontWeight: FontWeight.bold)),
                                       alignment: Alignment.bottomCenter,
                                     ),
                                   ],
