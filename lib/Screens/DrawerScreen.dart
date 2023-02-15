@@ -33,6 +33,7 @@ class DrawerScreen extends StatelessWidget {
           children: [
             Image.asset("images/logo.jfif"),
             SizedBox(height: 15,),
+            Text('guest_message',style: TextStyle(decoration: TextDecoration.underline),).tr(),
             StreamBuilder(
               stream: FirebaseFirestore.instance.collection("ratings").snapshots(),
               builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {

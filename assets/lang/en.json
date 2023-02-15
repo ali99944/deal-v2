@@ -11,7 +11,7 @@
   "share_message": "Share",
   "change_language_message": "Change Language",
   "login_message": "Login",
-  "welcome_message": "welcome to deal",
+  "welcome_message": "welcome to deal card",
   "email_message": "Email",
   "password_message": "Password",
   "phone_message": "phone number",
@@ -46,5 +46,9 @@
   "work_time": "workTime",
   "logout_message": "sign out",
   "rate": "rate",
-  "choose_language": "choose language"
+  "choose_language": "choose language",
+  "empty_search": "no deals found",
+  "err_disconnect": "you are disconnected",
+  "try again": "try again",
+  "reConnMess": "reconnect to a network and try again"
 }

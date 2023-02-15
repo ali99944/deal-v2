@@ -1,10 +1,7 @@
-import 'package:checkmark/checkmark.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import 'HomeScreen.dart';
 
 class QrCodeScanner extends StatefulWidget {
   const QrCodeScanner({Key? key}) : super(key: key);

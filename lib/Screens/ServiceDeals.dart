@@ -1,32 +1,68 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:deal/Screens/DealDetails.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:convert';
 
 import '../Provider/UserProvider.dart';
 import '../Services/UserServices.dart';
 
 class ServiceDeals extends StatefulWidget {
   final String category;
-  const ServiceDeals({Key? key, required this.category}) : super(key: key);
+  final String arCategory;
+  const ServiceDeals({Key? key, required this.category, required this.arCategory}) : super(key: key);
 
   @override
   State<ServiceDeals> createState() => _ServiceDealsState();
 }
 
 class _ServiceDealsState extends State<ServiceDeals> {
+  TextEditingController searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        actions: [],
+        title: context.locale.languageCode == 'en' ? Text(widget.category,style: TextStyle(fontWeight: FontWeight.w100),) : Text(widget.arCategory,style: TextStyle(fontWeight: FontWeight.w100)),
+        centerTitle: true,
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(60),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              width: double.infinity,
+              child: TextField(
+                decoration: InputDecoration(
+                  fillColor: Colors.white,
+                  filled: true,
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide.none,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  hintText: 'search here',
+                ),
+                onChanged: (val){
+                  setState(() {});
+                },
+                controller: searchController,
+              ),
+            ),
+          ),
+        ),
+      ),
       body: SafeArea(
         child: StreamBuilder(
           stream: FirebaseFirestore.instance.collection("cards").snapshots(),
           builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if(snapshot.hasData && !snapshot.hasError){
-              List serviceDeals = snapshot.data!.docs.where((field) => field['serviceName'] == widget.category).toList();
+              List serviceDeals = snapshot.data!.docs.isNotEmpty ? snapshot.data!.docs.where((field) => field['serviceName'] == widget.category)
+                  .toList() : [];
+              List filteredDeals = serviceDeals.isNotEmpty ? (context.locale.languageCode == 'en' ? serviceDeals.where((element) => element['shopName'].toLowerCase().contains(searchController.text.toLowerCase())) : serviceDeals.where((element) => element['arShopName'].toLowerCase().contains(searchController.text.toLowerCase())))
+                  .toList() : [];
               return serviceDeals.isEmpty ? Container(
                 child: Stack(
                   children: [
@@ -34,7 +70,7 @@ class _ServiceDealsState extends State<ServiceDeals> {
                       alignment: Alignment.center,
                         child:Text('emptyDeals',style: TextStyle(fontSize: 30,color: Colors.amber,fontFamily: 'serif'),).tr()
                     ),
-                    
+
                     Positioned(
                       child: IconButton(
                         icon: Icon(Icons.arrow_back_ios,size: 40,color: Colors.amber,),
@@ -48,7 +84,7 @@ class _ServiceDealsState extends State<ServiceDeals> {
                   ],
                 ),
                 color: Colors.black,
-              ) : ListView.builder(
+              ) : filteredDeals.isNotEmpty ? ListView.builder(
                 itemCount: serviceDeals.length,
                 itemBuilder: (context,i){
                   Map deal = serviceDeals[i].data();
@@ -128,6 +164,11 @@ class _ServiceDealsState extends State<ServiceDeals> {
                     ),
                   );
                 },
+              ) : Container(
+                color: Colors.black,
+                child: Center(
+                  child: Text('empty_search',style: TextStyle(fontSize: 30,color: Colors.amber,fontFamily: 'serif'),).tr(),
+                ),
               );
             }else{
               return Center(
