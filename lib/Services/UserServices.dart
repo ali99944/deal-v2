@@ -182,4 +182,31 @@ class UserServices{
   static Future getRatingScore() async{
 
   }
+
+  static Future changeUserToken({required String uid}) async{
+    List users = (await FirebaseFirestore.instance.collection("users").where('uid',isEqualTo: uid).get()).docs;
+    var user = users.isNotEmpty ? users.first : null;
+
+    if(user != null){
+      String? token = await CloudMessaging.getDeviceToken();
+
+
+      if(token != null){
+        await FirebaseFirestore.instance.collection("users").doc(user.id).update({
+          'deviceToken': token
+        });
+      }
+    }
+  }
+
+  static Future clearUserToken({required String uid}) async{
+    List users = (await FirebaseFirestore.instance.collection("users").where('uid',isEqualTo: uid).get()).docs;
+    var user = users.isNotEmpty ? users.first : null;
+
+    if(user != null){
+      await FirebaseFirestore.instance.collection("users").doc(user.id).update({
+        'deviceToken': ''
+      });
+    }
+  }
 }

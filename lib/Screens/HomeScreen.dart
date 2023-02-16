@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 import '../Provider/ConnectionProvider.dart';
 import 'DrawerScreen.dart';
 import 'ShoesDetails.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class HomeScreen extends StatefulWidget {
    HomeScreen({Key? key}) : super(key: key);
@@ -44,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     context: context,
                     builder: (context){
                       return ActionConfirm(
-                        message: 'are you sure you want to exit the app?'
+                        message: 'leaving_msg'.tr()
                       );
                     }
                 );
@@ -100,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ): CarouselSlider.builder(
                             options: CarouselOptions(
-                                height: 250,
+                                height: 210,
                                 autoPlay: true,
                                 initialPage: 0,
                                 viewportFraction: 1,
@@ -135,46 +136,52 @@ class _HomeScreenState extends State<HomeScreen> {
                         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                           if(snapshot.hasData && !snapshot.hasError){
                             List services = snapshot.data.docs;
-                            return Container(
-                              child: GridView.builder(
-                                itemCount: services.length,
-                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 2,
-                                    mainAxisSpacing: 1,
-                                  ),
-                                  itemBuilder: (context,i){
-                                    Map service = services[i].data();
-                                    return InkWell(
-                                      onTap: (){
-                                        Navigator.of(context).push(MaterialPageRoute(builder: (context){
-                                          return ServiceDeals(category:service['serviceName'],arCategory:service['arServiceName']);
-                                        }));
-                                      },
-                                      child: Container(
-                                        margin: EdgeInsets.all(3),
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                            fit: BoxFit.cover,
-                                            image: Image.memory(base64Decode(service['image'])).image
-                                          ),
-                                            borderRadius: BorderRadius.circular(8.0)
+                            return GridView.builder(
+                              itemCount: services.length,
+                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                  childAspectRatio: 257 / 160,
+				  crossAxisSpacing: 2,
+  				  mainAxisSpacing: 3,
+                                ),
+                                itemBuilder: (context,i){
+                                  Map service = services[i].data();
+                                  return InkWell(
+                                    onTap: (){
+                                      Navigator.of(context).push(MaterialPageRoute(builder: (context){
+                                        return ServiceDeals(category:service['serviceName'],arCategory:service['arServiceName']);
+                                      }));
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          fit: BoxFit.cover,
+                                          image: Image.memory(base64Decode(service['image'])).image
                                         ),
-                                        child: Stack(
-                                          children: [
-                                            Align(
-                                              child: Text(service['serviceName'] ?? '',style:TextStyle(color:Colors.white,fontSize:14,fontWeight: FontWeight.bold)),
-                                              alignment: Alignment.topCenter,
-                                            ),
-                                            Align(
-                                              child: Text('${service['arServiceName'] ?? ''}',style:TextStyle(color:Colors.white,fontSize:14,fontWeight: FontWeight.bold)),
-                                              alignment: Alignment.bottomCenter,
-                                            ),
-                                          ],
-                                        ),
+                                          borderRadius: BorderRadius.circular(8.0)
                                       ),
-                                    );
-                                  }
-                              ),
+                                      child: Stack(
+                                        children: [
+                                          Align(
+                                            child: AutoSizeText(
+                                                service['serviceName'] ?? '',
+                                                maxLines:1,
+                                                style:TextStyle(color:Colors.white,fontSize:14,fontWeight: FontWeight.bold)
+                                            ),
+                                            alignment: Alignment.topCenter,
+                                          ),
+                                          Align(
+                                            child: AutoSizeText(
+                                                service['arServiceName'] ?? '',
+                                                maxLines:1,
+                                                style:TextStyle(color:Colors.white,fontSize:14,fontWeight: FontWeight.bold)
+                                            ),alignment: Alignment.bottomCenter,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }
                             );
                           }else{
                             return Center(

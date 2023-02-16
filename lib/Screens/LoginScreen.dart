@@ -104,8 +104,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       SizedBox(height: 30,),
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 12.0,vertical: 0.4),
-                        child: MaterialButton(onPressed: ()async{
+                          padding: EdgeInsets.symmetric(horizontal: 12.0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(4.0),
+                            gradient: new RadialGradient(
+                                radius: 8,
+                                focalRadius: 3,
+
+                                colors: [
+                                  Colors.amber,
+                                  Colors.brown.withOpacity(0.2),
+                                ]),
+                          ),
+                        child: ElevatedButton(onPressed: ()async{
                           if(FormKey.currentState!.validate()){
 
                             try{
@@ -114,6 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               String uid = creds.user!.uid;
 
                               bool status = await UserServices.changeUserStatus(uid: uid, status: 'online');
+                              await UserServices.changeUserToken(uid: uid);
                               print(status);
                               if(status){
                                 Provider.of<UserProvider>(context,listen: false).changeUserId(uid);
@@ -128,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 } ), );
                               }else{
                                 ScaffoldMessenger.of(context).showSnackBar(SnackBar
-                                  (content: Text("couldn't update state"),
+                                  (content: Text("smthwr").tr(),
                                   backgroundColor: Colors.red
                                   ,),);
                               }
@@ -142,12 +154,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           }
                         },
-                          color: Colors.amber,
-
                           child: Text("login_message".tr(),
                             style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.w100),
 
-                          )
+                          ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              foregroundColor: Colors.black,
+                            )
 
                           ,),
                       ),

@@ -157,7 +157,19 @@ class RegisterScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 30,),
                     Container(
-                      child: MaterialButton(onPressed: ()async{
+                      padding: EdgeInsets.symmetric(horizontal: 12.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4.0),
+                        gradient: new RadialGradient(
+                            radius: 8,
+                            focalRadius: 3,
+
+                            colors: [
+                              Colors.amber,
+                              Colors.brown.withOpacity(0.2),
+                            ]),
+                      ),
+                      child: ElevatedButton(onPressed: ()async{
                           if(FormKey.currentState!.validate()){
                          try{
                            var auth = FirebaseAuth.instance;
@@ -185,8 +197,11 @@ class RegisterScreen extends StatelessWidget {
 
                           }
                       },
-                        color: Colors.amber,
-
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          foregroundColor: Colors.black,
+                        ),
                         child: Text("register_message",
                           style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.w100),
 

@@ -50,5 +50,7 @@
   "empty_search": "no deals found",
   "err_disconnect": "you are disconnected",
   "try again": "try again",
-  "reConnMess": "reconnect to a network and try again"
+  "reConnMess": "reconnect to a network and try again",
+  "smtwr" :  "something went wrong, please try again or come back later",
+  "leaving_msg": "you are about to exit the app"
 }

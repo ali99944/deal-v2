@@ -158,6 +158,7 @@ class DrawerScreen extends StatelessWidget {
                       onTap: ()async{
                         String uid = Provider.of<UserProvider>(context,listen:false).uid;
                         await UserServices.changeUserStatus(uid: uid, status: 'offline');
+                        await UserServices.clearUserToken(uid: uid);
 
                         SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
                         await sharedPreferences.setBool('isLogged',false);

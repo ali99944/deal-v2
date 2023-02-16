@@ -189,6 +189,8 @@ class ChooseLanguageWrapper extends StatelessWidget {
                           onPressed: () async {
                             await snapshot.data!
                                 .setBool('languageHasChose', true);
+                            await snapshot.data!
+                                .setString('languageCode', 'en');
                             await context.setLocale(Locale('en', ''));
                             await Navigator.of(context).pushReplacement(
                                 MaterialPageRoute(builder: (context) {
@@ -215,6 +217,7 @@ class ChooseLanguageWrapper extends StatelessWidget {
                             onPressed: () async {
                               await snapshot.data!
                                   .setBool('languageHasChose', true);
+                              await snapshot.data!.setString('languageCode','ar');
                               await context.setLocale(Locale('ar', ''));
                               await Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(builder: (context) {
@@ -222,7 +225,7 @@ class ChooseLanguageWrapper extends StatelessWidget {
                               }));
                             },
                             child: Ink(
-                                padding: EdgeInsets.symmetric(vertical: 8.0,horizontal: 36),
+                                padding: EdgeInsets.symmetric(vertical: 12.0,horizontal: 36),
                                 decoration: BoxDecoration(
                                   gradient: new RadialGradient(
                                       radius: 2,
@@ -245,7 +248,18 @@ class ChooseLanguageWrapper extends StatelessWidget {
                   ],
                 );
               } else {
-                return AuthWrapper(isLogged: isLogged);
+                String languageCode =
+                    snapshot.data!.getString('languageCode') ?? 'en';
+                return FutureBuilder(
+                  future: languageCode == 'en' ? context.setLocale(Locale('en','')) : context.setLocale(Locale('ar','')),
+                  builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+                    if(snapshot.connectionState == ConnectionState.done){
+                      return AuthWrapper(isLogged: isLogged);
+                    }else{
+                      return CircularProgressIndicator();
+                    }
+                  },
+                );
               }
             } else {
               return CircularProgressIndicator();
